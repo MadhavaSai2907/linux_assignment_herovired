@@ -249,8 +249,8 @@ mkdir -p /home/mike/workspace
 Assign ownership:
 
 ```bash
-sudo chown -R Sarah:Sarah /home/Sarah/workspace
-sudo chown -R mike:mike /home/mike/workspace
+chown -R Sarah:Sarah /home/Sarah/workspace
+chown -R mike:mike /home/mike/workspace
 ```
 
 ---
@@ -363,3 +363,207 @@ This step proves that **each user can access only their own workspace**, ensurin
 ## Conclusion
 
 This task establishes a **secure and scalable user management foundation**, suitable for development environments and compliant with standard Linux security practices.
+
+
+---
+
+# Task 3: Backup Configuration for Web Servers
+
+## Objective
+Configure **automated backups** for Apache and Nginx web servers to ensure **data integrity, disaster recovery, and audit readiness**.
+
+---
+
+## Scenario
+- Sarah manages an **Apache web server**
+- Mike manages a **Nginx web server**
+- Both servers require **regular automated backups**
+- Backups must include **configuration files and document roots**
+- Backup integrity must be verified after each run
+
+---
+
+## Prerequisite: Verify Web Servers Installation
+
+Before working on the Task , ensure that **Apache** and **Nginx** are installed on the server.  
+Backup scripts depend on the presence of their respective configuration and document root directories.
+
+- To install **Apache** and **Nginx** servers , use below commands
+
+### Apache
+```bash
+yum install httpd
+```
+
+### Nginx
+```bash
+yum install nginx
+```
+
+### Verify Apache Installation
+```bash
+ls /etc | grep httpd
+```
+
+### Verify NGINX Installation
+```bash
+ls /etc | grep nginx
+```
+
+
+## 1. Create Centralized Backup Directory
+
+Create a secure directory to store all backup files.
+
+```bash
+mkdir -p /backups
+````
+
+This ensures:
+
+* Backups are stored centrally
+* Only root can modify backup data
+
+---
+
+## 2. Create Apache Backup Script (Sarah)
+
+Create the Apache backup script:
+
+```bash
+nano /usr/local/bin/apache_backup.sh
+```
+
+Script content:
+
+```bash
+#!/bin/bash
+
+DATE=$(date +%F)
+BACKUP_FILE="/backups/apache_backup_${DATE}.tar.gz"
+LOG_FILE="/backups/apache_backup_verify.log"
+
+tar -czf $BACKUP_FILE /etc/httpd /var/www/html
+
+echo "[$(date)] Verifying Apache backup" >> $LOG_FILE
+tar -tzf $BACKUP_FILE >> $LOG_FILE
+echo "-----------------------------------" >> $LOG_FILE
+```
+
+To make the script executable for all the users, use below command
+
+```bash
+chmod +x /usr/local/bin/apache_backup.sh
+```
+
+---
+
+## 3. Create Nginx Backup Script (Mike)
+
+Create the Nginx backup script:
+
+```bash
+nano /usr/local/bin/nginx_backup.sh
+```
+
+Script content:
+
+```bash
+#!/bin/bash
+
+DATE=$(date +%F)
+BACKUP_FILE="/backups/nginx_backup_${DATE}.tar.gz"
+LOG_FILE="/backups/nginx_backup_verify.log"
+
+tar -czf $BACKUP_FILE /etc/nginx /usr/share/nginx/html
+
+echo "[$(date)] Verifying Nginx backup" >> $LOG_FILE
+tar -tzf $BACKUP_FILE >> $LOG_FILE
+echo "-----------------------------------" >> $LOG_FILE
+```
+
+To make the script executable for all the users use below command
+
+```bash
+chmod +x /usr/local/bin/nginx_backup.sh
+```
+
+---
+
+## 4. Schedule Automated Backups Using Cron
+
+Edit root crontab:
+
+```bash
+crontab -e
+```
+
+Add the following entries to run backups **every Tuesday at 12:00 AM**:
+
+```bash
+0 0 * * 2 /usr/local/bin/apache_backup.sh
+0 0 * * 2 /usr/local/bin/nginx_backup.sh
+```
+
+---
+
+## 5. Manual Backup Verification
+
+Run the scripts manually to validate functionality:
+
+```bash
+/usr/local/bin/apache_backup.sh
+/usr/local/bin/nginx_backup.sh
+```
+
+Verify backup files:
+
+```bash
+ls -lh /backups
+```
+
+<img width="1390" height="212" alt="backup folder" src="https://github.com/user-attachments/assets/5555af70-1c92-47a5-b7bc-d7f1c345eddd" />
+
+---
+
+## 6. Backup Integrity Verification
+
+Verify backup contents using log files:
+
+```bash
+cat /backups/apache_backup_verify.log
+cat /backups/nginx_backup_verify.log
+```
+
+**apache_backup_verify**
+
+<img width="1350" height="943" alt="Verification logs for apache" src="https://github.com/user-attachments/assets/4f5f0b42-089a-4946-8d57-62df44169e67" />
+
+**nginx_backup_verify**
+
+<img width="1317" height="933" alt="4-Verification logs for nginx" src="https://github.com/user-attachments/assets/efa5a207-51b6-4c8f-aca4-386e9908941f" />
+
+
+These logs confirm:
+
+* Backup archive is readable
+* Files are correctly included
+* Backup integrity is validated
+---
+
+
+
+## Outcome
+
+* Automated weekly backups configured
+* Configuration and web content protected
+* Backup integrity verified after each run
+* Secure and production-ready backup system implemented
+
+---
+
+
+## Conclusion
+
+This task implements a **reliable, secure, and automated backup strategy** for Apache and Nginx servers, ensuring operational resilience and disaster recovery readiness.
+
