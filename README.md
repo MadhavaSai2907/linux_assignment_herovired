@@ -363,15 +363,3 @@ This step proves that **each user can access only their own workspace**, ensurin
 ## Conclusion
 
 This task establishes a **secure and scalable user management foundation**, suitable for development environments and compliant with standard Linux security practices.
-
-```
-
-
-
-
-
-
-
-
-
-
