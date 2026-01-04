@@ -39,7 +39,6 @@ Therefore, we must first install **EPEL (Extra Packages for Enterprise Linux)** 
 
 ```bash
 yum install epel-release
-yum install htop nmon
 ```
 <img width="858" height="137" alt="epel for htop" src="https://github.com/user-attachments/assets/eae3cba8-dfb4-47ed-af11-a8f6fd624ec1" />
 
